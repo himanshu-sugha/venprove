@@ -11,27 +11,42 @@ export type DetectionResponseInitOpts = {
     }
 }
 
-export class DetectionResponse {
-    requestId: string
-    chainId: number
+export interface DetectionResponse {
     detected: boolean
-    error?: boolean
-    message?: string
+    error?: string
+    details?: {
+        owner: string
+        spender: string
+        amount: string
+        tokenAddress: string
+    }
+}
+
+export class DetectionResponse {
+    requestId?: string
+    chainId?: number
+    detected: boolean
+    error?: string
     protocolAddress?: string
     protocolName?: string
     additionalData?: Record<string, unknown>
+    details?: {
+        owner: string
+        spender: string
+        amount: string
+        tokenAddress: string
+    }
 
     constructor({
         request,
-        detectionInfo: { error, message, detected },
+        detectionInfo: { error, detected },
     }: DetectionResponseInitOpts) {
-        this.requestId = request.id ?? ''
-        this.chainId = request.chainId
-        this.protocolAddress = request.protocolAddress ?? ''
-        this.protocolName = request.protocolName ?? ''
-        this.additionalData = request.additionalData
-        this.error = error
-        this.message = message
+        this.requestId = request.id ?? request.requestId ?? ''
+        this.chainId = request.chainId ?? 0
+        this.protocolAddress = ''
+        this.protocolName = ''
+        this.additionalData = {}
+        this.error = error ? 'Error occurred' : undefined
         this.detected = detected
     }
 }
@@ -47,16 +62,21 @@ class DetectionResponseDTO {
     detected!: boolean
 
     @Expose()
-    error?: boolean
-
-    @Expose()
-    message?: string
+    error?: string
 
     @Expose()
     protocolAddress?: string
 
     @Expose()
     protocolName?: string
+
+    @Expose()
+    details?: {
+        owner: string
+        spender: string
+        amount: string
+        tokenAddress: string
+    }
 
     @Expose()
     additionalData?: Record<string, unknown>

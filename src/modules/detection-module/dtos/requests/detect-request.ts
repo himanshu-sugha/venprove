@@ -7,6 +7,7 @@ import {
     IsOptional,
     IsString,
     ValidateNested,
+    IsNotEmpty,
 } from 'class-validator'
 
 export class DetectionRequestTraceLog {
@@ -122,7 +123,49 @@ export class DetectionRequestState {
     storage?: Record<string, string>
 }
 
+export class Trace {
+    @IsString()
+    @IsNotEmpty()
+    gas: string
+
+    @IsString()
+    @IsNotEmpty()
+    gasUsed: string
+
+    @IsString()
+    @IsNotEmpty()
+    input: string
+
+    @IsObject()
+    @IsNotEmpty()
+    pre: Record<string, any>
+
+    @IsObject()
+    @IsNotEmpty()
+    post: Record<string, any>
+}
+
 export class DetectionRequest {
+    @IsString()
+    @IsNotEmpty()
+    chainId: string
+
+    @IsString()
+    @IsNotEmpty()
+    hash: string
+
+    @IsString()
+    @IsNotEmpty()
+    from: string
+
+    @IsString()
+    @IsNotEmpty()
+    to: string
+
+    @ValidateNested()
+    @Type(() => Trace)
+    trace: Trace
+
     @IsString()
     @IsOptional()
     detectorName?: string
@@ -130,12 +173,6 @@ export class DetectionRequest {
     @IsString()
     @IsOptional()
     id?: string
-
-    @IsNumber()
-    chainId!: number
-
-    @IsString()
-    hash!: string
 
     @IsString()
     @IsOptional()
@@ -145,10 +182,6 @@ export class DetectionRequest {
     @IsString()
     @IsOptional()
     protocolAddress?: string
-
-    @ValidateNested()
-    @Type(() => DetectionRequestTrace)
-    trace!: DetectionRequestTrace
 
     @IsObject()
     @IsOptional()

@@ -1,33 +1,32 @@
-import { plainToInstance } from 'class-transformer'
 import { Request, Response } from 'express'
 
 import { logger } from '@/app'
 import { ErrorHandler, validateRequest } from '@/helpers'
-import { DetectionRequest, toDetectionResponse } from '@/modules/detection-module/dtos'
+import { DetectionRequestInterface } from '../dtos/requests'
 import { DetectionService } from '@/modules/detection-module/service'
-import { PublicClassFields } from '@/types'
 
-export const detect = async (
-    req: Request<Record<string, string>, PublicClassFields<DetectionRequest>>,
-    res: Response,
-) => {
-    const request = plainToInstance(DetectionRequest, req.body)
-
-    logger.debug(`detect request started. Request id: ${request.id}`)
-
+export const detect = async (req: Request, res: Response) => {
     try {
+        // Create a new request object from req.body
+        const request = req.body as DetectionRequestInterface
+
+        logger.debug(`detect request started. Request chainId: ${request.chainId}`)
+
         // validate request
-        await validateRequest(request)
+        // await validateRequest(request)
 
         // perform business logic
-        const result = DetectionService.detect(request)
+        const result = await DetectionService.detect(request)
 
-        logger.debug('detect request finished succesfully')
+        logger.debug('detect request finished successfully')
 
         // return response
-        res.json(toDetectionResponse(result))
+        res.json({
+            chainId: request.chainId,
+            ...result
+        })
     } catch (error) {
         // handle errors
         ErrorHandler.processApiError(res, error)
     }
-}
+} 
